@@ -1,0 +1,14 @@
+diff -uNr a/linux-user/meson.build b/linux-user/meson.build
+--- a/linux-user/meson.build
++++ b/linux-user/meson.build
+@@ -21,7 +21,9 @@ linux_user_ss.add(files(
+   'uaccess.c',
+   'uname.c',
+ ))
+-linux_user_ss.add(rt)
++if not get_option('prefer_static')
++   linux_user_ss.add(rt)
++endif
+ linux_user_ss.add(libdw)
+ 
+ linux_user_ss.add(when: 'TARGET_HAS_BFLT', if_true: files('flatload.c'))

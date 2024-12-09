@@ -1,0 +1,38 @@
+Fix duplicate memfd_create and missing memalign in static build
+
+diff -uNr a/include/qemu/memfd.h b/include/qemu/memfd.h
+--- a/include/qemu/memfd.h
++++ b/include/qemu/memfd.h
+@@ -36,6 +36,12 @@
+ int memfd_create(const char *name, unsigned int flags);
+ #endif
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30 && defined CONFIG_MEMFD
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
++
+ int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+                       uint64_t hugetlbsize, unsigned int seals, Error **errp);
+ bool qemu_memfd_alloc_check(void);
+diff -uNr a/meson.build b/meson.build
+--- a/meson.build
++++ b/meson.build
+@@ -2637,9 +2637,13 @@ endif
+ config_host_data.set('CONFIG_MADVISE', has_madvise)
+ config_host_data.set('HAVE_MADVISE_WITHOUT_PROTOTYPE', missing_madvise_proto)
+ 
+-config_host_data.set('CONFIG_MEMFD', cc.links(gnu_source_prefix + '''
+-  #include <sys/mman.h>
+-  int main(void) { return memfd_create("foo", MFD_ALLOW_SEALING); }'''))
++if get_option('prefer_static')
++  config_host_data.set('CONFIG_MEMFD', cc.has_header_symbol('sys/syscall.h', 'SYS_memfd_create'))
++else
++  config_host_data.set('CONFIG_MEMFD', cc.links(gnu_source_prefix + '''
++    #include <sys/mman.h>
++    int main(void) { return memfd_create("foo", MFD_ALLOW_SEALING); }'''))
++endif
+ config_host_data.set('CONFIG_OPEN_BY_HANDLE', cc.links(gnu_source_prefix + '''
+   #include <fcntl.h>
+   #if !defined(AT_EMPTY_PATH)

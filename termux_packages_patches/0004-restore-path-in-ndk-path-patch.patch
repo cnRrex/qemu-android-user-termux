@@ -1,0 +1,50 @@
+From dfeed27c105e63084af2829a5bd4126f7f8fa9e8 Mon Sep 17 00:00:00 2001
+From: cnRrex <ratrex@qq.com>
+Date: Mon, 9 Dec 2024 22:51:52 +0800
+Subject: [PATCH 4/5] restore path in ndk path patch
+
+---
+ ndk-patches/27c/paths.h.patch | 25 ++++---------------------
+ 1 file changed, 4 insertions(+), 21 deletions(-)
+
+diff --git a/ndk-patches/27c/paths.h.patch b/ndk-patches/27c/paths.h.patch
+index b5c2684da4..97de1b64a8 100644
+--- a/ndk-patches/27c/paths.h.patch
++++ b/ndk-patches/27c/paths.h.patch
+@@ -1,29 +1,12 @@
+ --- ./usr/include/paths.h.orig	2021-08-16 11:55:04.492150066 +0200
+ +++ ./usr/include/paths.h	2021-08-16 11:55:42.498804733 +0200
+-@@ -40,14 +40,14 @@
+- 
+- #ifndef _PATH_BSHELL
+- /** Path to the default system shell. Historically the 'B' was to specify the Bourne shell. */
+--#define _PATH_BSHELL "/system/bin/sh"
+-+#define _PATH_BSHELL "@TERMUX_PREFIX@/bin/sh"
+- #endif
+- 
+- /** Path to the system console. */
+- #define _PATH_CONSOLE "/dev/console"
+- 
+- /** Default shell search path. */
+--#define _PATH_DEFPATH "/product/bin:/apex/com.android.runtime/bin:/apex/com.android.art/bin:/system_ext/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin"
+-+#define _PATH_DEFPATH "@TERMUX_PREFIX@/bin"
+- 
+- /** Path to the directory containing device files. */
+- #define _PATH_DEV "/dev/"
+ @@ -63,3 +63,9 @@
+  
+  /** Path to the calling process' tty. */
+  #define _PATH_TTY "/dev/tty"
+ +
+ +#define        _PATH_STDPATH   _PATH_DEFPATH
+-+#define        _PATH_TMP       "@TERMUX_PREFIX@/tmp/"
+-+#define        _PATH_VARDB     "@TERMUX_PREFIX@/var/db/"
+-+#define        _PATH_VARRUN    "@TERMUX_PREFIX@/var/run/"
+-+#define        _PATH_VARTMP    "@TERMUX_PREFIX@/var/tmp/"
+++#define        _PATH_TMP       "/tmp/"
+++#define        _PATH_VARDB     "/var/db/"
+++#define        _PATH_VARRUN    "/var/run/"
+++#define        _PATH_VARTMP    "/var/tmp/"
+-- 
+2.39.5
+

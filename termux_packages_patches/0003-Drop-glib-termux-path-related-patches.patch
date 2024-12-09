@@ -1,0 +1,181 @@
+From eb9e12ddf07a2843432ddc342d187f87bc76744b Mon Sep 17 00:00:00 2001
+From: cnRrex <ratrex@qq.com>
+Date: Mon, 9 Dec 2024 22:48:59 +0800
+Subject: [PATCH 3/5] Drop glib termux path related patches
+
+---
+ packages/glib/gio-gdbusprivate.c.patch        | 13 -------
+ .../glib/gio-gkeyfilesettingsbackend.c.patch  | 11 ------
+ packages/glib/gio-gnetworking.h.in.patch      | 11 ------
+ packages/glib/gio-xdgmime-xdgmime.c.patch     | 11 ------
+ packages/glib/glib-gcharset.c.patch           | 11 ------
+ packages/glib/glib-gspawn.c.patch             | 19 ----------
+ packages/glib/glib-gutils.c.patch             | 38 -------------------
+ 7 files changed, 114 deletions(-)
+ delete mode 100644 packages/glib/gio-gdbusprivate.c.patch
+ delete mode 100644 packages/glib/gio-gkeyfilesettingsbackend.c.patch
+ delete mode 100644 packages/glib/gio-gnetworking.h.in.patch
+ delete mode 100644 packages/glib/gio-xdgmime-xdgmime.c.patch
+ delete mode 100644 packages/glib/glib-gcharset.c.patch
+ delete mode 100644 packages/glib/glib-gspawn.c.patch
+ delete mode 100644 packages/glib/glib-gutils.c.patch
+
+diff --git a/packages/glib/gio-gdbusprivate.c.patch b/packages/glib/gio-gdbusprivate.c.patch
+deleted file mode 100644
+index 430bde9933..0000000000
+--- a/packages/glib/gio-gdbusprivate.c.patch
++++ /dev/null
+@@ -1,13 +0,0 @@
+---- ./gio/gdbusprivate.c.orig	2021-12-10 17:28:44.551721009 +0530
+-+++ ./gio/gdbusprivate.c	2021-12-10 19:24:17.521718364 +0530
+-@@ -2477,8 +2477,9 @@
+- 
+-   /* Copy what dbus.git does: allow the /var/lib path to be configurable at
+-    * build time, but hard-code the system-wide machine ID path in /etc. */
+-+  /* Note that LOCALSTATEDIR is defined as "@TERMUX_PREFIX@/var". */
+-   const gchar *var_lib_path = LOCALSTATEDIR "/lib/dbus/machine-id";
+--  const gchar *etc_path = "/etc/machine-id";
+-+  const gchar *etc_path = "@TERMUX_PREFIX@/etc/machine-id";
+- 
+-   if (!g_file_get_contents (var_lib_path,
+-                             &ret,
+diff --git a/packages/glib/gio-gkeyfilesettingsbackend.c.patch b/packages/glib/gio-gkeyfilesettingsbackend.c.patch
+deleted file mode 100644
+index 9de2bf083d..0000000000
+--- a/packages/glib/gio-gkeyfilesettingsbackend.c.patch
++++ /dev/null
+@@ -1,11 +0,0 @@
+---- ./gio/gkeyfilesettingsbackend.c.orig	2021-12-10 19:39:09.321718024 +0530
+-+++ ./gio/gkeyfilesettingsbackend.c	2021-12-10 19:39:26.371718018 +0530
+-@@ -662,7 +662,7 @@
+- load_system_settings (GKeyfileSettingsBackend *kfsb)
+- {
+-   GError *error = NULL;
+--  const char *dir = "/etc/glib-2.0/settings";
+-+  const char *dir = "@TERMUX_PREFIX@/etc/glib-2.0/settings";
+-   char *path;
+-   char *contents;
+- 
+diff --git a/packages/glib/gio-gnetworking.h.in.patch b/packages/glib/gio-gnetworking.h.in.patch
+deleted file mode 100644
+index bcbca915ff..0000000000
+--- a/packages/glib/gio-gnetworking.h.in.patch
++++ /dev/null
+@@ -1,11 +0,0 @@
+---- ./gio/gnetworking.h.in.orig	2021-12-10 19:44:29.271717902 +0530
+-+++ ./gio/gnetworking.h.in	2021-12-10 19:45:00.881717890 +0530
+-@@ -51,7 +51,7 @@
+- #endif
+- 
+- #ifndef _PATH_RESCONF
+--#define _PATH_RESCONF "/etc/resolv.conf"
+-+#define _PATH_RESCONF "@TERMUX_PREFIX@/etc/resolv.conf"
+- #endif
+- 
+- #ifndef CMSG_LEN
+diff --git a/packages/glib/gio-xdgmime-xdgmime.c.patch b/packages/glib/gio-xdgmime-xdgmime.c.patch
+deleted file mode 100644
+index ecaf6ddf29..0000000000
+--- a/packages/glib/gio-xdgmime-xdgmime.c.patch
++++ /dev/null
+@@ -1,11 +0,0 @@
+---- ./gio/xdgmime/xdgmime.c.orig	2021-12-10 20:05:07.591717430 +0530
+-+++ ./gio/xdgmime/xdgmime.c	2021-12-10 20:05:11.861717428 +0530
+-@@ -235,7 +235,7 @@
+-   xdg_data_dirs = getenv ("XDG_DATA_DIRS");
+- 
+-   if (xdg_data_dirs == NULL)
+--    xdg_data_dirs = "/usr/local/share/:/usr/share/";
+-+    xdg_data_dirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
+- 
+-   /* Work out how many dirs we’re dealing with. */
+-   if (xdg_data_home != NULL || home != NULL)
+diff --git a/packages/glib/glib-gcharset.c.patch b/packages/glib/glib-gcharset.c.patch
+deleted file mode 100644
+index a2875c2083..0000000000
+--- a/packages/glib/glib-gcharset.c.patch
++++ /dev/null
+@@ -1,11 +0,0 @@
+---- ./glib/gcharset.c.orig	2021-12-10 21:38:06.571715302 +0530
+-+++ ./glib/gcharset.c	2021-12-10 21:38:11.361715300 +0530
+-@@ -503,7 +503,7 @@
+-   if (g_once_init_enter_pointer (&alias_table))
+-     {
+-       GHashTable *table = g_hash_table_new (g_str_hash, g_str_equal);
+--      read_aliases ("/usr/share/locale/locale.alias", table);
+-+      read_aliases ("@TERMUX_PREFIX@/share/locale/locale.alias", table);
+-       g_once_init_leave_pointer (&alias_table, table);
+-     }
+- 
+diff --git a/packages/glib/glib-gspawn.c.patch b/packages/glib/glib-gspawn.c.patch
+deleted file mode 100644
+index 4b64d6bf59..0000000000
+--- a/packages/glib/glib-gspawn.c.patch
++++ /dev/null
+@@ -1,19 +0,0 @@
+-+++ ./glib/gspawn-posix.c
+-@@ -1404,7 +1404,7 @@
+-        * * what to search if PATH is unset. POSIX may, dunno.
+-        * */
+- 
+--      chosen_search_path = "/bin:/usr/bin:.";
+-+      chosen_search_path = "@TERMUX_PREFIX@/bin:.";
+-     }
+- 
+-   if (search_path || search_path_from_envp)
+-@@ -1815,7 +1815,7 @@
+-   if (argc + 2 > argv_buffer_len)
+-     return FALSE;
+- 
+--  argv_buffer[0] = (char *) "/bin/sh";
+-+  argv_buffer[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
+-   argv_buffer[1] = (char *) file;
+-   while (argc > 0)
+-     {
+diff --git a/packages/glib/glib-gutils.c.patch b/packages/glib/glib-gutils.c.patch
+deleted file mode 100644
+index 8d649cd6fe..0000000000
+--- a/packages/glib/glib-gutils.c.patch
++++ /dev/null
+@@ -1,38 +0,0 @@
+---- ./glib/gutils.c.orig	2021-12-11 13:35:15.354088542 +0530
+-+++ ./glib/gutils.c	2021-12-11 13:36:59.724088502 +0530
+-@@ -369,7 +369,7 @@
+-        * what to search if PATH is unset. POSIX may, dunno.
+-        */
+-       
+--      path = "/bin:/usr/bin:.";
+-+      path = "@TERMUX_PREFIX@/bin:.";
+-     }
+- #else
+-   n = GetModuleFileNameW (NULL, wfilename, MAXPATHLEN);
+-@@ -949,7 +949,7 @@
+-       if (tmp == NULL || *tmp == '\0')
+-         {
+-           g_free (tmp);
+--          tmp = g_strdup ("/tmp");
+-+          tmp = g_strdup ("@TERMUX_PREFIX@/tmp");
+-         }
+- #endif /* !G_OS_WIN32 */
+- 
+-@@ -1526,7 +1526,7 @@
+-   else
+-     return NULL;
+- #elif defined (G_OS_UNIX)
+--  const gchar * const os_release_files[] = { "/etc/os-release", "/usr/lib/os-release" };
+-+  const gchar * const os_release_files[] = { "@TERMUX_PREFIX@/etc/os-release", "@TERMUX_PREFIX@/lib/os-release" };
+-   gsize i;
+-   gchar *buffer = NULL;
+-   gchar *result = NULL;
+-@@ -2465,7 +2465,7 @@
+-    */
+- #ifndef G_OS_WIN32
+-   if (!data_dirs || !data_dirs[0])
+--    data_dirs = "/usr/local/share/:/usr/share/";
+-+    data_dirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
+- 
+-   data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+- #else
+-- 
+2.39.5
+

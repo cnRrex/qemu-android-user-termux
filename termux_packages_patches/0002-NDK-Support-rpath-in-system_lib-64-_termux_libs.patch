@@ -1,0 +1,95 @@
+From 2b774fb60c60958e74ad9a2d2e37a3f0bb3862c0 Mon Sep 17 00:00:00 2001
+From: cnRrex <ratrex@qq.com>
+Date: Mon, 9 Dec 2024 22:41:10 +0800
+Subject: [PATCH 2/5] NDK: Support rpath in system_lib(64)_termux_libs
+
+---
+ .../toolchain/termux_setup_toolchain_23c.sh      | 16 ++++++++++++++--
+ .../toolchain/termux_setup_toolchain_27c.sh      | 16 ++++++++++++++--
+ 2 files changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/build/toolchain/termux_setup_toolchain_23c.sh b/scripts/build/toolchain/termux_setup_toolchain_23c.sh
+index 0b84428740..c2bd07f4e3 100644
+--- a/scripts/build/toolchain/termux_setup_toolchain_23c.sh
++++ b/scripts/build/toolchain/termux_setup_toolchain_23c.sh
+@@ -22,6 +22,18 @@ termux_setup_toolchain_23c() {
+ 		TERMUX_HASKELL_OPTIMISATION="-O0"
+ 	fi
+ 
++	if [ "$TERMUX_ARCH" = "arm" ]; then
++		export CUSTOM_RPATH="/system/lib/termux_libs"
++	elif [ "$TERMUX_ARCH" = "i686" ]; then
++		export CUSTOM_RPATH="/system/lib/termux_libs"
++	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
++		export CUSTOM_RPATH="/system/lib64/termux_libs"
++	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
++		export CUSTOM_RPATH="/system/lib64/termux_libs"
++	else
++		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
++	fi
++
+ 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+ 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
+ 		export CC_FOR_BUILD=gcc
+@@ -31,7 +43,7 @@ termux_setup_toolchain_23c() {
+ 		if [ $TERMUX_ARCH = arm ]; then
+ 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
+ 		fi
+-		LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib"
++		LDFLAGS+=" -Wl,-rpath=$CUSTOM_RPATH:$TERMUX_PREFIX/lib"
+ 	else
+ 		export CC_FOR_BUILD=$CC
+ 		# Some build scripts use environment variable 'PKG_CONFIG', so
+@@ -100,7 +112,7 @@ termux_setup_toolchain_23c() {
+ 	fi
+ 	local env_host="${CARGO_TARGET_NAME//-/_}"
+ 	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
+-	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
++	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=$CUSTOM_RPATH:${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
+ 	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
+
+ 	export ac_cv_func_getpwent=no
+diff --git a/scripts/build/toolchain/termux_setup_toolchain_27c.sh b/scripts/build/toolchain/termux_setup_toolchain_27c.sh
+index f9c36559e9..75470c66b6 100644
+--- a/scripts/build/toolchain/termux_setup_toolchain_27c.sh
++++ b/scripts/build/toolchain/termux_setup_toolchain_27c.sh
+@@ -22,6 +22,18 @@ termux_setup_toolchain_27c() {
+ 		TERMUX_HASKELL_OPTIMISATION="-O0"
+ 	fi
+ 
++	if [ "$TERMUX_ARCH" = "arm" ]; then
++		export CUSTOM_RPATH="/system/lib/termux_libs"
++	elif [ "$TERMUX_ARCH" = "i686" ]; then
++		export CUSTOM_RPATH="/system/lib/termux_libs"
++	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
++		export CUSTOM_RPATH="/system/lib64/termux_libs"
++	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
++		export CUSTOM_RPATH="/system/lib64/termux_libs"
++	else
++		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
++	fi
++
+ 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+ 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
+ 		export CC_FOR_BUILD=gcc
+@@ -31,7 +43,7 @@ termux_setup_toolchain_27c() {
+ 		if [ $TERMUX_ARCH = arm ]; then
+ 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
+ 		fi
+-		LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib"
++		LDFLAGS+=" -Wl,-rpath=$CUSTOM_RPATH:$TERMUX_PREFIX/lib"
+ 	else
+ 		export CC_FOR_BUILD=$CC
+ 		# Some build scripts use environment variable 'PKG_CONFIG', so
+@@ -101,7 +113,7 @@ termux_setup_toolchain_27c() {
+ 	fi
+ 	local env_host="${CARGO_TARGET_NAME//-/_}"
+ 	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
+-	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
++	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=$CUSTOM_RPATH:${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
+ 	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
+
+ 	export ac_cv_func_getpwent=no
+-- 
+2.39.5
+

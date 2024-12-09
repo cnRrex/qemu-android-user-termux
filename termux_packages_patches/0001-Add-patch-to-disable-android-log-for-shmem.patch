@@ -1,0 +1,43 @@
+From 3cc6fc3ba97079d6e8930bdfe111b141ba2230ba Mon Sep 17 00:00:00 2001
+From: cnRrex <ratrex@qq.com>
+Date: Mon, 9 Dec 2024 22:35:24 +0800
+Subject: [PATCH 1/5] Add patch to disable android log for shmem
+
+---
+ ...0001-optional-drop-android-log-print.patch | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100644 packages/libandroid-shmem/0001-optional-drop-android-log-print.patch
+
+diff --git a/packages/libandroid-shmem/0001-optional-drop-android-log-print.patch b/packages/libandroid-shmem/0001-optional-drop-android-log-print.patch
+new file mode 100644
+index 0000000000..e71fdb3bb6
+--- /dev/null
++++ b/packages/libandroid-shmem/0001-optional-drop-android-log-print.patch
+@@ -0,0 +1,24 @@
++diff --git a/Makefile b/Makefile
++--- a/Makefile
+++++ b/Makefile
++@@ -1,4 +1,5 @@
++ CFLAGS += -fpic -shared -std=c11 -Wall -Wextra
+++CFLAGS += -DNDEBUG
++ LDFLAGS += -Wl,--version-script=exports.txt
++ 
++ libandroid-shmem.a: shmem.o
++diff --git a/shmem.c b/shmem.c
++--- a/shmem.c
+++++ b/shmem.c
++@@ -17,7 +17,11 @@
++ 
++ #include "shm.h"
++ 
+++#ifdef NDEBUG
+++#define DBG(...) do {} while (0)
+++#else
++ #define DBG(...) __android_log_print(ANDROID_LOG_INFO, "shmem", __VA_ARGS__)
+++#endif
++ #define ASHV_KEY_SYMLINK_PATH _PATH_TMP "ashv_key_%d"
++ #define ANDROID_SHMEM_SOCKNAME "/dev/shm/%08x"
++ #define ROUND_UP(N, S) ((((N) + (S) - 1) / (S)) * (S))
+-- 
+2.39.5
+

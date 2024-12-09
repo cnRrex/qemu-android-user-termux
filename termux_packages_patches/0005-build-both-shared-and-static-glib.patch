@@ -1,0 +1,42 @@
+From 5b618379d3d27ea1c1dee8a6422ce31e6d207890 Mon Sep 17 00:00:00 2001
+From: cnRrex <ratrex@qq.com>
+Date: Mon, 9 Dec 2024 22:52:36 +0800
+Subject: [PATCH 5/5] build both shared and static glib
+
+---
+ packages/glib/build.sh | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/packages/glib/build.sh b/packages/glib/build.sh
+index 2f6cebcf36..b069e37237 100644
+--- a/packages/glib/build.sh
++++ b/packages/glib/build.sh
+@@ -17,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ -Dlibmount=disabled
+ -Dman-pages=enabled
+ -Dtests=false
++-Ddefault_library=both
+ "
+ TERMUX_PKG_RM_AFTER_INSTALL="
+ bin/glib-gettextize
+@@ -90,7 +91,7 @@ termux_step_pre_configure() {
+ 		mkdir -p "$TERMUX_PKG_BUILDDIR"
+ 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/"-Dintrospection=enabled"/"-Dintrospection=disabled"}"
+ 		termux_setup_gir
+-		
++
+ 		cd "$TERMUX_PKG_BUILDDIR"
+ 		TERMUX_PREFIX="$_PREFIX" termux_step_configure
+ 		cd "$TERMUX_PKG_BUILDDIR"
+@@ -123,7 +124,7 @@ termux_step_pre_configure() {
+ 		cd "$TERMUX_PKG_BUILDDIR"
+ 		termux_step_make_install
+ 	)
+-	
++
+ 	# Place the GIR files inside the root of the GIR directory (gir/.) of the package
+ 	termux_setup_gir
+ 
+-- 
+2.39.5
+
